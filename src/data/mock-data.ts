@@ -1,5 +1,37 @@
+import { time } from "console"
+
 const mockData = {
   users: [
+    { firstName: "Roberto",
+      lastName: "Silva",
+      userId: "123456",
+      dob: "1990-05-01",
+      login: {
+        lastLogin: "2025-03-27",
+        loginCount: 5,
+        failedLoginCount: 2,
+        locked: false,
+      },
+      bankAccount: {
+        balance: 1000,
+        lastDeposit: "2025-03-27",
+        currentGeneralLimit: 15000,
+        approvedGeneralLimit: 18000,
+        creditCard: {
+          balance: 500,
+          dueDate: "2025-04-05",
+          minimumPayment: 250,
+          creditLimit: 10000,
+          approvedCreditLimit: 12000,
+        },
+        cardDelivery: {
+          address: "123 Main St, Anytown, USA",
+          status: "Pending",
+          date: "2025-03-27",
+          time: "05:00 PM",
+        },
+      },
+    },
     {
       firstName: "John",
       lastName: "Doe",

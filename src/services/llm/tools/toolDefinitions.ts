@@ -40,7 +40,7 @@ export const toolDefinitions : LLMToolDefinition[] = [
           properties: {
             targetLanguage: {
               type: 'string',
-              description: 'The target language to switch to. SHOULD BE ONE OF THE FOLLOWING: ["english","spanish"]',
+              description: 'The target language to switch to. SHOULD BE ONE OF THE FOLLOWING: ["portuguese","english","spanish"]',
             },
           },
           required: ['targetLanguage'],
@@ -123,6 +123,65 @@ export const toolDefinitions : LLMToolDefinition[] = [
         },
       },
     },
+    {
+      type: 'function',
+      function: {
+        name: 'check_increase_limit',
+        description: 'Checks whether the user is eligible for a credit or account limit increase',
+        parameters: {
+          type: 'object',
+          properties: {
+            userId: {
+              type: 'string',
+              description: 'The user ID. Must be validated using verify_user_identity',
+            },
+          },
+          required: ['userId'],
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'troubleshoot_login_issues',
+        description: 'Assists the user in resolving common login issues such as password reset, 2FA problems, or locked accounts',
+        parameters: {
+          type: 'object',
+          properties: {
+            email: {
+              type: 'string',
+              description: 'Email address associated with the user account',
+            },
+            issueType: {
+              type: 'string',
+              description: 'Type of login issue. SHOULD BE ONE OF THE FOLLOWING: ["forgot_password", "2fa_issue", "account_locked", "other"]',
+            },
+          },
+          required: ['email', 'issueType'],
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'check_card_delivery',
+        description: 'Checks the status of a card delivery for the user',
+        parameters: {
+          type: 'object',
+          properties: {
+            userId: {
+              type: 'string',
+              description: 'The user ID. Must be validated using verify_user_identity',
+            },
+            cardType: {
+              type: 'string',
+              description: 'Type of card requested. SHOULD BE ONE OF THE FOLLOWING: ["debit", "credit", "replacement"]',
+            },
+          },
+          required: ['userId', 'cardType'],
+        },
+      },
+    },    
     // {
     //   type: 'function',
     //   function: {

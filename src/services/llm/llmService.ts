@@ -9,6 +9,9 @@ import { systemPrompt } from "../../prompts/systemPrompt";
 import { EventEmitter } from "events";
 import {
   verifyUser,
+  checkIncreaseLimit,
+  checkCardDelivery,
+  troubleshootLoginIssues,
   checkPendingBill,
   searchCommonMedicalTerms,
   humanAgentHandoff,
@@ -242,6 +245,9 @@ export class LLMService extends EventEmitter {
       // update the toolFunction to use the toolDefinitions
       const toolFunction = {
         verify_user_identity: verifyUser,
+        check_increase_limit: checkIncreaseLimit,
+        check_card_delivery: checkCardDelivery,
+        troubleshoot_login_issues: troubleshootLoginIssues,
         check_pending_bill: checkPendingBill,
         search_common_medical_terms: searchCommonMedicalTerms,
         human_agent_handoff: humanAgentHandoff,
