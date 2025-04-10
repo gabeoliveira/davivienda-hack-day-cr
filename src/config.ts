@@ -11,6 +11,8 @@ const configSchema = z.object({
   TWILIO_ACCOUNT_SID: z.string().min(1, "Twilio Account SID is required"),
   TWILIO_AUTH_TOKEN: z.string().min(1, "Twilio Auth Token is required"),
   TWILIO_WORKFLOW_SID: z.string().min(1, "Twilio Workflow SID is required"),
+
+  TWILIO_VOICE_INTELLIGENCE_SID: z.string().min(1,"Twilio Voice Intelligence SID is required"),
   
   // Ngrok Configuration
   NGROK_DOMAIN: z.string().optional(),
@@ -30,7 +32,7 @@ const configSchema = z.object({
 });
 
 // Validate and parse the environment variables
-let parsedConfig: { TWILIO_ACCOUNT_SID: string; TWILIO_AUTH_TOKEN: string; TWILIO_WORKFLOW_SID: string; WELCOME_GREETING?: string | undefined; PORT: string; NGROK_DOMAIN?: string | undefined; SPEECH_KEY?: string | undefined; SPEECH_REGION?: string | undefined; OPENAI_API_KEY?: string | undefined; };
+let parsedConfig: { TWILIO_ACCOUNT_SID: string; TWILIO_AUTH_TOKEN: string; TWILIO_WORKFLOW_SID: string; TWILIO_VOICE_INTELLIGENCE_SID: string; WELCOME_GREETING?: string | undefined; PORT: string; NGROK_DOMAIN?: string | undefined; SPEECH_KEY?: string | undefined; SPEECH_REGION?: string | undefined; OPENAI_API_KEY?: string | undefined; };
 
 try {
   parsedConfig = configSchema.parse(process.env);
@@ -48,6 +50,7 @@ export const config = {
     accountSid: parsedConfig.TWILIO_ACCOUNT_SID,
     authToken: parsedConfig.TWILIO_AUTH_TOKEN,
     workflowSid: parsedConfig.TWILIO_WORKFLOW_SID,
+    voiceIntelligenceSid: parsedConfig.TWILIO_VOICE_INTELLIGENCE_SID,
     welcomeGreeting: parsedConfig.WELCOME_GREETING
   },
   ngrok: {

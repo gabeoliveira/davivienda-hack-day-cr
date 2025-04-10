@@ -57,11 +57,11 @@ export const toolDefinitions : LLMToolDefinition[] = [
           properties: {
             firstName: {
               type: 'string',
-              description: 'First name of the user',
+              description: 'First name of the user. DO NOT send this property with any form of accentuation',
             },
             lastName: {
               type: 'string',
-              description: 'Last name of the user',
+              description: 'Last name of the user. DO NOT send this property with any form of accentuation',
             },
             DOB: {
               type: 'string',

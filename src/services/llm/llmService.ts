@@ -1,5 +1,9 @@
 import OpenAI from "openai";
 import { ChatCompletionCreateParams } from "openai/resources/chat/completions";
+import { ChatCompletionMessageParam } from "openai/resources/chat";
+import { Stream } from "openai/streaming";
+import { ChatCompletionChunk } from "openai/resources/chat/completions";
+
 // import { Stream } from "openai/streaming";
 // import {
 //   ChatCompletionChunk,
@@ -65,55 +69,69 @@ export class LLMService extends EventEmitter {
         ...options,
       });
 
-      const message = completion.choices[0]?.message;
+      if ("choices" in completion) {
 
-      // Check if there are tool calls that need to be executed
-      if (message?.tool_calls && message.tool_calls.length > 0) {
-        // Process tool calls
-        const toolCallResults = await Promise.all(
-          message.tool_calls.map(async (toolCall) => {
-            try {
-              const result = await this.executeToolCall(toolCall);
-              return {
-                tool_call_id: toolCall.id,
-                role: "tool" as const,
-                content: result,
-              };
-            } catch (error) {
-              console.error(
-                `Tool call ${toolCall.function.name} failed:`,
-                error
-              );
-              return {
-                tool_call_id: toolCall.id,
-                role: "tool" as const,
-                content: `Error executing tool: ${
-                  error instanceof Error ? error.message : "Unknown error"
-                }`,
-              };
-            }
-          })
-        );
+        const message = completion.choices[0]?.message;
 
-        // Prepare messages for next completion
-        const newMessages = [
-          ...this.messages,
-          {
-            role: "assistant",
-            tool_calls: message.tool_calls,
-            content: null,
-          },
-          ...toolCallResults,
-        ];
+          // Check if there are tool calls that need to be executed
+        if (message?.tool_calls && message.tool_calls.length > 0) {
+          // Process tool calls
+          const toolCallResults = await Promise.all(
+            message.tool_calls.map(async (toolCall) => {
+              try {
+                const result = await this.executeToolCall(toolCall);
+                return {
+                  tool_call_id: toolCall.id,
+                  role: "tool" as const,
+                  content: result,
+                };
+              } catch (error) {
+                console.error(
+                  `Tool call ${toolCall.function.name} failed:`,
+                  error
+                );
+                return {
+                  tool_call_id: toolCall.id,
+                  role: "tool" as const,
+                  content: `Error executing tool: ${
+                    error instanceof Error ? error.message : "Unknown error"
+                  }`,
+                };
+              }
+            })
+          );
 
-        // Recursive call to continue completion after tool calls
-        return this.chatCompletion(newMessages, tools, options);
+          // Prepare messages for next completion
+          const newMessages: ChatCompletionMessageParam[] = [
+            ...this.messages,
+            {
+              role: "assistant",
+              tool_calls: message.tool_calls,
+              content: null,
+            },
+            ...toolCallResults,
+          ];
+
+          // Recursive call to continue completion after tool calls
+          return this.chatCompletion(newMessages, tools, options);
+        }
+
+        // Add the assistant's message to conversation history
+        this.messages.push(message);
+        console.log("message", message);
+        this.emit("chatCompletion:complete", message);
+
+        return completion; 
+
+      
+      } else
+        {
+
+        throw new Error("Streaming completions are not supported in this context");
       }
 
-      // Add the assistant's message to conversation history
-      this.messages.push(message);
-      console.log("message", message);
-      this.emit("chatCompletion:complete", message);
+  
+
     } catch (error) {
       this.emit("chatCompletion:error", error);
       console.error("LLM Chat Completion Error:", error);
@@ -125,7 +143,7 @@ export class LLMService extends EventEmitter {
     messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
     tools?: LLMToolDefinition[],
     options?: Partial<ChatCompletionCreateParams>
-  ) {
+  ): Promise<void> {
     try {
       this.messages.push(...messages);
 
@@ -138,7 +156,7 @@ export class LLMService extends EventEmitter {
         tools: toolDefinitions, // functions as any,
         tool_choice: tools ? "auto" : undefined,
         ...options,
-      });
+      }) as Stream<ChatCompletionChunk>;;
 
       const toolCalls: OpenAI.Chat.Completions.ChatCompletionMessageToolCall[] =
         [];

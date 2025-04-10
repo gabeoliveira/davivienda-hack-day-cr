@@ -21,11 +21,13 @@ export const languageOptions: { [key: string]: LanguageOption } = {
     speechModel: "nova-2-general",
   },
   spanish: {
-    locale_code: "es-US",
-    ttsProvider: "google",
-    voice: "es-US-Journey-F", //"Lucia-Generative", // "", //"Lucia-Generative", ///"es-US-Journey-F",
-    transcriptionProvider: "google",
-    speechModel: "telephony",
+    locale_code: "es-ES",
+    ttsProvider: "ElevenLabs",
+    voice: "x5IDPSl4ZUbhosMmVFTk", //"Lucia-Generative", // "", //"Lucia-Generative", ///"es-US-Journey-F",
+    transcriptionProvider: "Deepgram",
+    transcriptionLanguage: 'es',
+    speechModel: "nova-2-general",
+
   },
   english: {
     locale_code: "en-US",

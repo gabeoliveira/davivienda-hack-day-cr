@@ -43,15 +43,15 @@ Note that the `ngrok` command above forwards to a development server running on 
 
 2. Navigate to the project directory:
    ```sh
-   cd twilio-conversation-relay-sample
+   cd davivienda-hack-day-cr
    ```
 3. Install dependencies:
    ```sh
-   npm install
+   yarn install
    ```
 4. Copy the sample environment file and configure the environment variables:
    ```sh
-   cp .env.sample .env
+   cp .env.example .env
    ```
 
 Once created, open `.env` in your code editor. You are required to set the following environment variables for the app to function properly:
