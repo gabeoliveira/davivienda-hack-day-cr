@@ -12,7 +12,6 @@ import { ChatCompletionChunk } from "openai/resources/chat/completions";
 import { systemPrompt } from "../../prompts/systemPrompt";
 import { EventEmitter } from "events";
 import {
-  verifyUser,
   checkIncreaseLimit,
   checkCardDelivery,
   troubleshootLoginIssues,
@@ -24,6 +23,8 @@ import {
   checkHsaAccount,
   checkPaymentOptions,
   switchLanguage,
+  identifyUser,
+  addSurveyResponse
 } from "./tools";
 
 export class LLMService extends EventEmitter {
@@ -151,12 +152,12 @@ export class LLMService extends EventEmitter {
 
       const stream = await this.openai.chat.completions.create({
         stream: true,
-        model: options?.model || "gpt-3.5-turbo",
+        model: options?.model || "gpt-4.1",
         messages: this.messages,
         tools: toolDefinitions, // functions as any,
         tool_choice: tools ? "auto" : undefined,
         ...options,
-      }) as Stream<ChatCompletionChunk>;;
+      }) as Stream<ChatCompletionChunk>;
 
       const toolCalls: OpenAI.Chat.Completions.ChatCompletionMessageToolCall[] =
         [];
@@ -250,6 +251,11 @@ export class LLMService extends EventEmitter {
 
   async setup(message: any) {
    // Handle setup message
+  const userContext = {
+    customerPhone: message.from
+  }
+   const userContextMessage: OpenAI.Chat.Completions.ChatCompletionMessageParam = { role: "system", content: JSON.stringify(userContext)};
+   this.messages.push(userContextMessage);
   }
 
   async executeToolCall(
@@ -262,7 +268,6 @@ export class LLMService extends EventEmitter {
 
       // update the toolFunction to use the toolDefinitions
       const toolFunction = {
-        verify_user_identity: verifyUser,
         check_increase_limit: checkIncreaseLimit,
         check_card_delivery: checkCardDelivery,
         troubleshoot_login_issues: troubleshootLoginIssues,
@@ -272,6 +277,8 @@ export class LLMService extends EventEmitter {
         check_hsa_account: checkHsaAccount,
         check_payment_options: checkPaymentOptions,
         switch_language: switchLanguage,
+        identify_user: identifyUser,
+        add_survey_response: addSurveyResponse
       }[name];
 
       if (!toolFunction) {

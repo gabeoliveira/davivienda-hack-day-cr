@@ -50,31 +50,6 @@ export const toolDefinitions : LLMToolDefinition[] = [
     {
       type: 'function',
       function: {
-        name: 'verify_user_identity',
-        description: 'Verify the identity of a user',
-        parameters: {
-          type: 'object',
-          properties: {
-            firstName: {
-              type: 'string',
-              description: 'First name of the user. DO NOT send this property with any form of accentuation',
-            },
-            lastName: {
-              type: 'string',
-              description: 'Last name of the user. DO NOT send this property with any form of accentuation',
-            },
-            DOB: {
-              type: 'string',
-              description: 'Date of birth of the user. Format: YYYY-MM-DD',
-            },
-          },
-          required: ['firstName', 'lastName', 'DOB'],
-        },
-      },
-    },
-    {
-      type: 'function',
-      function: {
         name: 'check_pending_bill',
         description: 'Check if the user has a pending medical bill',
         parameters: {
@@ -227,6 +202,59 @@ export const toolDefinitions : LLMToolDefinition[] = [
             },
           },
           required: ["reason"],
+        }
+      },
+    },{
+      type: 'function',
+      function: {
+        name: 'identify_user',
+        description: 'Identify the user based on the incoming phone number. Everytime the user need to perform ANY action, you should start with this one',
+        parameters: {
+          type: "object",
+          properties: {
+            customerPhone: {
+              type: "string",
+              description:
+                "Customer's phone number in MSISDN format. It's used as their identification on the user database.",
+            }
+          },
+          required: ["customerPhone"],
+        }
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'add_survey_response',
+        description: "Add a Customer Satisfaction Survey Response. This should be called everytime the user says there's nothing else you can help with",
+        parameters: {
+          type: "object",
+          properties: {
+            customerPhone: {
+              type: "string",
+              description:
+                "Customer's phone number in MSISDN format. It's used as their identification on the user database.",
+            },
+            inGeneral: {
+              type: "number",
+              description: "The customer's general satisfaction with their service. It MUST range between 1 and 5. No other values should be accepted"
+            },
+            lastService: {
+              type: "number",
+              description: "The customer's satisfaction with their last service. It MUST range between 1 and 5. No other values should be accepted"
+            },
+            lastDriver: {
+              type: "number",
+              description: "The customer's general satisfaction with their last driver. It MUST range between 1 and 5. No other values should be accepted"
+            },
+            observations: {
+              type: "string",
+              description:
+                "Customer's comments on their evaluation",
+            }
+            
+          },
+          required: ["customerPhone", "inGeneral", "lastService", "lastDriver"],
         }
       },
     },

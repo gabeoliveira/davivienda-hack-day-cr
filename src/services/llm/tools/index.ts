@@ -1,6 +1,5 @@
 export * from './toolDefinitions';
 export * from './getCurrentWeather';
-export * from './verifyUserIdentity';
 export * from './troubleshootLoginIssues';
 export * from './checkIncreaseLimit';
 export * from './checkCardDelivery';
@@ -10,3 +9,5 @@ export * from './humanAgentHandoff';
 export * from './checkHsaAccount';
 export * from './checkPaymentOptions';
 export * from './switchLanguage';
+export * from './identifyUser';
+export * from './addSurveyResponse';

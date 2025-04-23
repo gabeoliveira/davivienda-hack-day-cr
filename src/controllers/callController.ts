@@ -18,7 +18,7 @@ export async function handleIncomingCall(callData: CallDetails): Promise<string>
                   statusCallbackUrl="https://events.hookdeck.com/e/src_su8VnSes9EUDvIpR3fV01ywb/transcriptions"/> 
               </Start>   
               <Connect action="https://${config.ngrok.domain}/api/action">
-                    <ConversationRelay url="wss://${config.ngrok.domain}" dtmfDetection="true" interruptible="true" interruptByDtmf="true"
+                    <ConversationRelay url="wss://${config.ngrok.domain}" dtmfDetection="true" interruptible="true"
                       welcomeGreeting="${config.twilio.welcomeGreeting}"
                       ttsProvider="${config.languages.spanish.ttsProvider}"
                       ttsLanguage="${config.languages.spanish.locale_code}"

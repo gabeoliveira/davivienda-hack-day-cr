@@ -26,13 +26,16 @@ const configSchema = z.object({
   
   // OpenAI Configuration
   OPENAI_API_KEY: z.string().optional(),
+
+  // Google APIs Configuration
+  GOOGLESHEETS_SPREADSHEET_ID: z.string().optional(),
   
   // Optional: Server Port
   PORT: z.string().optional().default('3000')
 });
 
 // Validate and parse the environment variables
-let parsedConfig: { TWILIO_ACCOUNT_SID: string; TWILIO_AUTH_TOKEN: string; TWILIO_WORKFLOW_SID: string; TWILIO_VOICE_INTELLIGENCE_SID: string; WELCOME_GREETING?: string | undefined; PORT: string; NGROK_DOMAIN?: string | undefined; SPEECH_KEY?: string | undefined; SPEECH_REGION?: string | undefined; OPENAI_API_KEY?: string | undefined; };
+let parsedConfig: { TWILIO_ACCOUNT_SID: string; TWILIO_AUTH_TOKEN: string; TWILIO_WORKFLOW_SID: string; TWILIO_VOICE_INTELLIGENCE_SID: string; WELCOME_GREETING?: string | undefined; PORT: string; NGROK_DOMAIN?: string | undefined; SPEECH_KEY?: string | undefined; SPEECH_REGION?: string | undefined; OPENAI_API_KEY?: string | undefined; GOOGLESHEETS_SPREADSHEET_ID?: string | undefined};
 
 try {
   parsedConfig = configSchema.parse(process.env);
@@ -66,6 +69,10 @@ export const config = {
   server: {
     port: parseInt(parsedConfig.PORT || '3000', 10)
   },
+  google: {
+    spreadsheetId: parsedConfig.GOOGLESHEETS_SPREADSHEET_ID
+  },
+  
   languages: languageOptions,
 };
 

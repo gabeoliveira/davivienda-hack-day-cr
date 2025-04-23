@@ -13,9 +13,9 @@ export const languageOptions: { [key: string]: LanguageOption } = {
   
   portuguese: {
     locale_code: "pt-BR",
-    ttsProvider: "Elevenlabs",
+    ttsProvider: "ElevenLabs",
     ttsLanguage: "pt-BR",
-    voice: "Eric-flash_v2_5",
+    voice: "iScHbNW8K33gNo3lGgbo",
     transcriptionProvider: "Deepgram",
     transcriptionLanguage: "pt-BR",
     speechModel: "nova-2-general",
@@ -23,7 +23,7 @@ export const languageOptions: { [key: string]: LanguageOption } = {
   spanish: {
     locale_code: "es-ES",
     ttsProvider: "ElevenLabs",
-    voice: "x5IDPSl4ZUbhosMmVFTk", //"Lucia-Generative", // "", //"Lucia-Generative", ///"es-US-Journey-F",
+    voice: "x5IDPSl4ZUbhosMmVFTk",
     transcriptionProvider: "Deepgram",
     transcriptionLanguage: 'es',
     speechModel: "nova-2-general",

@@ -9,7 +9,7 @@ export function initializeWebSocketHandlers(wss: WebSocketServer) {
   wss.on("connection", (ws: WebSocket) => {
     console.log("New WebSocket connection");
 
-    const llmService = new LLMService();
+    const llmService = new LLMService(config.openai.apiKey);
     const dtmfHelper = new DTMFHelper();
 
     ws.on("message", (message: string) => {
