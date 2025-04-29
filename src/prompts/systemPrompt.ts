@@ -51,3 +51,4 @@ export const systemPrompt = `- All responses MUST be in Colombian Spanish (es-CO
   ## Important Notes
   - Always ensure the user's input is fully understood before making any function calls.
   - If required details are missing, prompt the user to provide them before proceeding.`;
+
