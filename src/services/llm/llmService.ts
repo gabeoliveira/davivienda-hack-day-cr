@@ -30,7 +30,11 @@ import {
 export class LLMService extends EventEmitter {
   private openai: OpenAI;
   private messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[];
+  private _interruptionMessage?: ChatCompletionMessageParam;
   private _userInterrupted: boolean | undefined;
+  private _streamActive: boolean | undefined;
+  private _streamDepth = 0;
+  private _awaitingPostInterruptPrompt = false;
 
   public get userInterrupted(): boolean | undefined {
     return this._userInterrupted;
@@ -39,6 +43,19 @@ export class LLMService extends EventEmitter {
   public set userInterrupted(value: boolean | undefined) {
     this._userInterrupted = value;
   }
+
+  public get streamActive() {
+    return this._streamActive;
+  }
+
+  public get awaitingPostInterruptPrompt(): boolean {
+    return this._awaitingPostInterruptPrompt;
+  }
+  
+  public set awaitingPostInterruptPrompt(value: boolean) {
+    this._awaitingPostInterruptPrompt = value;
+  }
+  
 
   constructor(apiKey?: string) {
     super();
@@ -145,10 +162,28 @@ export class LLMService extends EventEmitter {
     tools?: LLMToolDefinition[],
     options?: Partial<ChatCompletionCreateParams>
   ): Promise<void> {
+    console.log("userInterrupted?", this._userInterrupted);
+    console.log("awaitingPostInterruptPrompt?", this.awaitingPostInterruptPrompt);
+    console.log("messages to stream:", messages);
+
     try {
+      if (this._userInterrupted && this._interruptionMessage) {
+        messages.push(this._interruptionMessage); // or push, depending on style
+        this._interruptionMessage = undefined;
+        this._userInterrupted = false;
+      }
+
       this.messages.push(...messages);
 
       console.log("streamChatCompletion", this.messages);
+      // Prevent multiple simultaneous completions
+      if (this._streamDepth === 0 && this._streamActive) {
+        console.warn("Stream already active. Skipping new request.");
+        return;
+      }
+      this._streamActive = true;
+      this._streamDepth++;
+      console.log(`streamChatCompletion entered — depth: ${this._streamDepth}`);
 
       const stream = await this.openai.chat.completions.create({
         stream: true,
@@ -164,6 +199,12 @@ export class LLMService extends EventEmitter {
 
       let llmResponse = "";
       for await (const chunk of stream) {
+        if (this._userInterrupted) {
+          console.log("Stream interrupted by user.");
+          this.emit("streamChatCompletion:interrupted", llmResponse);
+          break;
+        }
+
         let content = chunk.choices[0]?.delta?.content || "";
         let deltas = chunk.choices[0].delta;
         let finishReason = chunk.choices[0].finish_reason;
@@ -243,10 +284,30 @@ export class LLMService extends EventEmitter {
           return this.streamChatCompletion(newMessages, tools, options);
         }
       }
+
+
+      console.log(this._streamDepth, this._userInterrupted);
+
+
     } catch (error) {
       console.error("LLM Stream Chat Completion Error:", error);
       throw error;
     }
+    finally {
+      this._streamDepth--;
+      console.log(`streamChatCompletion exited — depth: ${this._streamDepth}`);
+    
+      // ✅ Only reset flags at the outermost layer
+      if (this._streamDepth <= 0) {
+        this._streamDepth = 0;
+        this._streamActive = false;
+        this._userInterrupted = false;
+      }
+    }
+  }
+
+  public addInterruptionMessage(message: ChatCompletionMessageParam) {
+    this._interruptionMessage = message;
   }
 
   async setup(message: any) {

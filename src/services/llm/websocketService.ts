@@ -18,9 +18,16 @@ export function initializeWebSocketHandlers(wss: WebSocketServer) {
         console.log("Parsed message:", parsedMessage);
         switch (parsedMessage.type) {
           case "prompt":
-            llmService.streamChatCompletion([
-              { role: "user", content: parsedMessage.voicePrompt },
-            ]);
+            // If we're waiting for a post-interruption prompt, allow it
+            if (!llmService.streamActive || llmService.awaitingPostInterruptPrompt) {
+              llmService.awaitingPostInterruptPrompt = false;
+
+              llmService.streamChatCompletion([
+                { role: "user", content: parsedMessage.voicePrompt },
+              ]);
+            } else {
+              console.warn("Stream already active — ignoring new prompt.");
+            }
             break;
           case "setup":
             llmService.setup(parsedMessage);
@@ -29,7 +36,17 @@ export function initializeWebSocketHandlers(wss: WebSocketServer) {
             // Handle error case if needed
             break;
           case "interrupt":
+            const { utteranceUntilInterrupt } = parsedMessage;
+
             llmService.userInterrupted = true;
+            llmService.awaitingPostInterruptPrompt = true;
+
+
+            llmService.addInterruptionMessage({
+              role: "system",
+              content: `You were interrupted. This is what you said until interruption: "${utteranceUntilInterrupt}"`
+            });
+
             break;
           case "dtmf":
               console.log("DTMF Message", parsedMessage);
