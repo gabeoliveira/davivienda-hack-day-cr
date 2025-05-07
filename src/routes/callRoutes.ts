@@ -9,9 +9,16 @@ router.post('/incoming-call', async (req: Request, res: Response) => {
     res.type('text/xml');
     console.log('Incoming call', callDetails);
     res.status(200).send(callDetails);
-    await initiateRecording(req.body.CallSid);
   } catch (error) {
     res.status(500).json({ error: 'Failed to process incoming call' });
+  }
+
+  try{
+    await initiateRecording(req.body.CallSid);
+  }
+
+  catch(error){
+    console.log("Unable to start recording", error);
   }
 });
 

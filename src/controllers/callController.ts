@@ -12,7 +12,8 @@ export async function handleIncomingCall(callData: CallDetails): Promise<string>
   }
 
   // Refer the ConversationRelay docs for a complete list of attributes - https://www.twilio.com/docs/voice/twiml/connect/conversationrelay#conversationrelay-attributes
-  return `<Response>
+  return `<?xml version="1.0" encoding="UTF-8"?>
+          <Response>
               <Start>
                 <Transcription intelligenceService="${config.twilio.voiceIntelligenceSid}"
                   languageCode="es-MX" 
