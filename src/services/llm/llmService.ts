@@ -10,6 +10,7 @@ import { ChatCompletionChunk } from "openai/resources/chat/completions";
 //   ChatCompletionMessage,
 // } from "openai/resources/chat/completions";
 import { systemPrompt } from "../../prompts/systemPrompt";
+import { getAdditionalContext } from "../../prompts/additionalContext";
 import { EventEmitter } from "events";
 import {
   checkIncreaseLimit,
@@ -24,7 +25,8 @@ import {
   checkPaymentOptions,
   switchLanguage,
   identifyUser,
-  addSurveyResponse
+  addSurveyResponse,
+  bookDriver
 } from "./tools";
 
 export class LLMService extends EventEmitter {
@@ -65,7 +67,11 @@ export class LLMService extends EventEmitter {
     this.messages =
       new Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>({
         role: "system",
-        content: systemPrompt,
+        content: systemPrompt
+      },
+      {
+        role: "system",
+        content: getAdditionalContext()   
       });
   }
 
@@ -286,9 +292,6 @@ export class LLMService extends EventEmitter {
       }
 
 
-      console.log(this._streamDepth, this._userInterrupted);
-
-
     } catch (error) {
       console.error("LLM Stream Chat Completion Error:", error);
       throw error;
@@ -339,7 +342,8 @@ export class LLMService extends EventEmitter {
         check_payment_options: checkPaymentOptions,
         switch_language: switchLanguage,
         identify_user: identifyUser,
-        add_survey_response: addSurveyResponse
+        add_survey_response: addSurveyResponse,
+        book_driver: bookDriver
       }[name];
 
       if (!toolFunction) {

@@ -11,3 +11,4 @@ export * from './checkPaymentOptions';
 export * from './switchLanguage';
 export * from './identifyUser';
 export * from './addSurveyResponse';
+export * from './bookDriver';

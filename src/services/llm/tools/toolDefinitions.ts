@@ -258,4 +258,37 @@ export const toolDefinitions : LLMToolDefinition[] = [
         }
       },
     },
+    {
+      type: 'function',
+      function: {
+        name: 'book_driver',
+        description: 'Books a driver using Conductor Eligido or Motorista da Rodada services with specified details.',
+        parameters: {
+          type: "object",
+          required: [ "date", "time", "duration", "summary"],
+          properties: {
+            date: {
+              type: "string",
+              description: "Date of the booking in YYYY-MM-DD format."
+            },
+            time: {
+              type: "string",
+              description: "Time of the booking in HH:mm format (24h)."
+            },
+            duration: {
+              type: "number",
+              description: "Duration of the booking in minutes, should always be 30."
+            },
+            summary: {
+              type: "string",
+              description: "Name of the customer as a summary of the booking."
+            },
+            description: {
+              type: "string",
+              description: "Optional description for the booking."
+            },
+          }
+        }        
+      }
+    }
   ];
