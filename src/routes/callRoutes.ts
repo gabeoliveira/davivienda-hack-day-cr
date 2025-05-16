@@ -14,7 +14,7 @@ router.post('/incoming-call', async (req: Request, res: Response) => {
   }
 
   try{
-    await initiateRecording(req.body.CallSid);
+    //await initiateRecording(req.body.CallSid);
   }
 
   catch(error){

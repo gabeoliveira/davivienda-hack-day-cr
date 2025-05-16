@@ -109,6 +109,14 @@ export function initializeWebSocketHandlers(wss: WebSocketServer) {
       ws.send(JSON.stringify(endMessage));
     });
 
+    llmService.on("endInteraction", () => {
+      const endMessage = {
+        type: "end",
+      };
+
+      ws.send(JSON.stringify(endMessage));
+    });
+
     llmService.on("switchLanguage", (message: any) => {
 
       const languageCode = config.languages[message.targetLanguage]?.locale_code;

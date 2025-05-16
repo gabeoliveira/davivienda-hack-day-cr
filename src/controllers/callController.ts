@@ -28,7 +28,9 @@ export async function handleIncomingCall(callData: CallDetails): Promise<string>
                       ttsLanguage="${config.languages.spanish.locale_code}"
                       voice="${config.languages.spanish.voice}"
                       transcriptionProvider="${config.languages.spanish.transcriptionProvider}"
-                      transcriptionLanguage="${config.languages.spanish.transcriptionLanguage}"> 
+                      transcriptionLanguage="${config.languages.spanish.transcriptionLanguage}"
+                      elevenlabsTextNormalization="on"
+                      > 
                     </ConversationRelay>
               </Connect>
           </Response>`;

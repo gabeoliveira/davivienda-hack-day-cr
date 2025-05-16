@@ -11,6 +11,7 @@ import { ChatCompletionChunk } from "openai/resources/chat/completions";
 // } from "openai/resources/chat/completions";
 import { systemPrompt } from "../../prompts/systemPrompt";
 import { getAdditionalContext } from "../../prompts/additionalContext";
+import { config } from "../../config";
 import { EventEmitter } from "events";
 import {
   checkIncreaseLimit,
@@ -37,6 +38,8 @@ export class LLMService extends EventEmitter {
   private _streamActive: boolean | undefined;
   private _streamDepth = 0;
   private _awaitingPostInterruptPrompt = false;
+  private _shouldEndAfterStream: boolean = false;
+
 
   public get userInterrupted(): boolean | undefined {
     return this._userInterrupted;
@@ -72,6 +75,11 @@ export class LLMService extends EventEmitter {
       {
         role: "system",
         content: getAdditionalContext()   
+      },
+      {
+        role: "assistant",
+        content: config.twilio.welcomeGreeting
+        
       });
   }
 
@@ -222,7 +230,15 @@ export class LLMService extends EventEmitter {
         if (finishReason === "stop") {
           this.messages.push({ role: "assistant", content: llmResponse });
           this.emit("streamChatCompletion:complete", content);
-          return;
+
+          // Graceful hang-up after stream
+          if (this._shouldEndAfterStream) {
+            console.log("Gracefully ending after final response...");
+            this.emit("endInteraction");
+            this._shouldEndAfterStream = false; // reset flag
+
+            return;
+          }
         } else {
           this.emit("streamChatCompletion:partial", content);
         }
@@ -356,7 +372,9 @@ export class LLMService extends EventEmitter {
         this.emit("humanAgentHandoff", JSON.parse(args));
       } else if (name === "switch_language") {
         this.emit("switchLanguage", JSON.parse(args));
-      }
+      } else if (name === "add_survey_response") {
+        this._shouldEndAfterStream = true;
+      }      
 
       return result;
     } catch (error) {
